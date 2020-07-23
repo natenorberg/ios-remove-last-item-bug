@@ -32,7 +32,7 @@ struct ContentView: View {
                         Image(systemName: "plus")
                     }
                 )
-            DetailView()
+            DetailView(delete: {})
         }.navigationViewStyle(DoubleColumnNavigationViewStyle())
     }
 }
@@ -44,7 +44,10 @@ struct MasterView: View {
         List {
             ForEach(dates, id: \.self) { date in
                 NavigationLink(
-                    destination: DetailView(selectedDate: date)
+                    destination: DetailView(
+                        selectedDate: date,
+                        delete: {self.dates.removeAll(where: {$0 == date})}
+                    )
                 ) {
                     Text("\(date, formatter: dateFormatter)")
                 }
@@ -57,13 +60,19 @@ struct MasterView: View {
 
 struct DetailView: View {
     var selectedDate: Date?
+    var delete: () -> Void
 
     var body: some View {
-        Group {
-            if selectedDate != nil {
-                Text("\(selectedDate!, formatter: dateFormatter)")
-            } else {
-                Text("Detail view content goes here")
+        VStack(alignment: .center, spacing: 16) {
+            Group {
+                if selectedDate != nil {
+                    Text("\(selectedDate!, formatter: dateFormatter)")
+                } else {
+                    Text("Detail view content goes here")
+                }
+            }
+            Button(action: self.delete) {
+              Text("Delete").foregroundColor(.red)
             }
         }.navigationBarTitle(Text("Detail"))
     }
